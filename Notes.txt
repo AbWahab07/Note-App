@@ -1,0 +1,25 @@
+- Yargs Module
+    Parses the default process.argv array into useful information
+    returns an object with key/value pairs
+    run npm install yargs@4.7.1
+    test these commands
+      node app.js add 
+      node app.js add --title="secrets"
+      node app.js add --title="secrets from Abdul"
+
+- Debugging Node Application
+    add 'debugger' statement [Hint: refer to readNote() debugger statement]
+    run node inspect app.js read --title="Ahead"
+    press c to continue to debugger line
+    press n to move to next line
+    enter repl to use REPL
+    type ctrl+c to exit REPL
+    type .exit to exit debugger
+  Use nodemon instead of node so we can restart the app when we do any change
+    run nodemon inspect app.js read --title="Ahead"
+
+- Allow debugging in elint
+  debugger // eslint-disable-line
+  
+
+  

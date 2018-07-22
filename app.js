@@ -1,50 +1,55 @@
-const express = require('express');
 const chalk = require('chalk');
-const debug = require('debug')('app');
-const morgan = require('morgan');
-const fs = require('fs');
-const os = require('os');
 const _ = require('lodash');
+const yargs = require('yargs');
 
 
-const app = express();
-const port = process.env.PORT || 3000;
+const notes = require('./notes');
 
-app.use(morgan('tiny'));
-
-
-// Using moudle.exports from notes.js
-var notes = require('./notes');
-debug(notes.name); // abdul
-var add = notes.add(2, 3);
-debug(`Adding two numbers. Result is ${add}`); // 5
+let added;
+let removed;
+let noteRead;
+let message;
+let notesList;
+// app.use(morgan('tiny'));
 
 
-// Using Lodash utilities
-debug(_.isString('Abdul')); // true
-debug(_.isString(true)); // false
-var uniqArry = _.uniq(['Abdul', 'Abdul', 1, 2, 2, 1]); // ['Abdul', 1, 2]
-debug(uniqArry);
+/*
+console.log(process.argv); // Lists arguments of the CLI
+const command = process.argv[2]; // Default Argv array
+console.log(command);
+*/
 
-
-// Using os built-in Module
-var user = os.userInfo();
-debug(user.username); // ok
-
-
-// Using fs buit-in Module
-fs.appendFile('greetings.txt', `Hello ${user.username}`, (err) => {
-	if (err)
-		debug(err);
-	else
-		debug('Data was sucessfully appended to the file');
-});
-
-
-app.get('/', (req, res) => {
-	res.send('Hello');
-});
-
-app.listen(port, () => {
-	debug(`Server is running at ${chalk.green(port)}`);
-});
+// Yargs uses the same default process.argv array but it parses the arguments in a better way
+// We're using yargs.argv instead of process.argv
+const { argv } = yargs;
+const command = argv._[0];
+// console.log(argv);
+switch (command) {
+  // node app.js add --title= --body=
+  case 'add':
+    added = notes.addNote(argv.title, argv.body);
+    message = added ? `Note "${chalk.green(argv.title)}" has been added.` : `Note with title "${chalk.red(argv.title)}" already exists`;
+    console.log(message);
+    break;
+  case 'remove':
+    // node app.js remove --title=
+    removed = notes.removeNote(argv.title);
+    message = removed ? `Note with title "${chalk.green(argv.title)}" has been deleted` : `Note with title "${chalk.red(argv.title)}" doesn't exists`;
+    console.log(message);
+    break;
+  case 'list':
+  // node app.js list
+    notesList = notes.listNotes();
+    if (notesList.length > 0) {
+      notesList.forEach(note => notes.logNote(note));
+    }
+    break;
+  case 'read':
+  // node app.js read --title=
+    noteRead = notes.readNote(argv.title);
+    message = noteRead ? `Note title: ${chalk.green(noteRead.title)} \nNote body: ${chalk.green(noteRead.body)}` : `Note with title ${chalk.red(argv.title)} doesn't found`;
+    console.log(message);
+    break;
+  default:
+    console.log(chalk.red('Command Not Recognized'));
+}
