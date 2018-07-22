@@ -10,6 +10,17 @@ let removed;
 let noteRead;
 let message;
 let notesList;
+const title = {
+  describe: 'Title of the note',
+  demand: true,
+  alias: 't'
+};
+
+const body = {
+  describe: 'Body of the note',
+  demand: true,
+  alias: 'b'
+};
 // app.use(morgan('tiny'));
 
 
@@ -21,7 +32,19 @@ console.log(command);
 
 // Yargs uses the same default process.argv array but it parses the arguments in a better way
 // We're using yargs.argv instead of process.argv
-const { argv } = yargs;
+const { argv } = yargs
+  .command('add', 'Add a new note', {
+    title,
+    body,
+  })
+  .command('remove', 'Remove a Note', {
+    title
+  })
+  .command('list', 'List all the notes')
+  .command('read', 'Read a note', {
+    title
+  })
+  .help();
 const command = argv._[0];
 // console.log(argv);
 switch (command) {
@@ -38,14 +61,14 @@ switch (command) {
     console.log(message);
     break;
   case 'list':
-  // node app.js list
+    // node app.js list
     notesList = notes.listNotes();
     if (notesList.length > 0) {
       notesList.forEach(note => notes.logNote(note));
     }
     break;
   case 'read':
-  // node app.js read --title=
+    // node app.js read --title=
     noteRead = notes.readNote(argv.title);
     message = noteRead ? `Note title: ${chalk.green(noteRead.title)} \nNote body: ${chalk.green(noteRead.body)}` : `Note with title ${chalk.red(argv.title)} doesn't found`;
     console.log(message);
